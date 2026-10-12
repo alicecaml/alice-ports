@@ -6,7 +6,7 @@
       },
       "locked": {
         "lastModified": 1791796756,
-        "narHash": "sha256-UuRAIe/P9xFXThTPSHHNuiz1dIDYl+V+53EjRWyQEW0=",
+        "narHash": "sha256-nn8hjE8GxJq1izcqbIef4Bi6oZtqvUYWsRos/meRXqo=",
         "owner": "alicecaml",
         "repo": "alice",
         "rev": "59d7e5cb03a09136738e8c78edc79b905f20b1b5",
@@ -36,11 +36,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1791260994,
-        "narHash": "sha256-Miqqk/ammqnTUxaoCyvtwoPeLbI1ksFyLxi/CazZpWY=",
+        "lastModified": 1791594108,
+        "narHash": "sha256-XK4KceonkwD8LuMAt/vNrz982mXJM5jeHAxMwsUXXAQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4",
+        "rev": "6510408d147d8c5e6d76043e899e9251756f6a75",
         "type": "github"
       },
       "original": {
