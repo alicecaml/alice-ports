@@ -15,10 +15,10 @@
       depLines = builtins.map (
         {
           name,
-          source,
+          built,
           ...
         }:
-        "    ${name} path=\"${source}\""
+        "    ${name} path=\"${built}\""
       ) deps;
       depString = pkgs.lib.strings.join "\n" depLines;
     in
@@ -66,7 +66,7 @@
           alice
         ];
         buildPhase = ''
-          alice build
+          alice build --built-artifacts-from-deps
         '';
         installPhase = ''
           mkdir -p $out
