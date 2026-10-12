@@ -1,10 +1,12 @@
 # Alice Ports
 
-Nix derivations for porting OCaml projects to build with Alice.
+[![test](https://github.com/alicecaml/alice-ports/actions/workflows/test.yml/badge.svg)](https://github.com/alicecaml/alice-ports/actions/workflows/test.yml)
+
+Nix derivations for porting OCaml projects to build with [Alice](https://alicecaml.org).
 
 ## Usage
 
-Run:
+Assemble and build the ports with [Nix Flakes](https://nixos.wiki/wiki/flakes) by running:
 ```
 $ nix build
 ```
