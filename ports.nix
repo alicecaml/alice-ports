@@ -80,35 +80,40 @@ rec {
     ];
     prepare =
       let
-        lib_ml = pkgs.writeText "lib.ml" ''
-          module CommonPath = CommonPath
-          module FilePath = FilePath
-          module FilePath_type = FilePath_type
-          module FileStringExt = FileStringExt
-          module FileUtil = FileUtil
-          module FileUtilCHMOD = FileUtilCHMOD
-          module FileUtilCMP = FileUtilCMP
-          module FileUtilCP = FileUtilCP
-          module FileUtilDU = FileUtilDU
-          module FileUtilFIND = FileUtilFIND
-          module FileUtilLS = FileUtilLS
-          module FileUtilMKDIR = FileUtilMKDIR
-          module FileUtilMV = FileUtilMV
-          module FileUtilMisc = FileUtilMisc
-          module FileUtilMode = FileUtilMode
-          module FileUtilPWD = FileUtilPWD
-          module FileUtilPermission = FileUtilPermission
-          module FileUtilREADLINK = FileUtilREADLINK
-          module FileUtilRM = FileUtilRM
-          module FileUtilSTAT = FileUtilSTAT
-          module FileUtilSize = FileUtilSize
-          module FileUtilTEST = FileUtilTEST
-          module FileUtilTOUCH = FileUtilTOUCH
-          module FileUtilTypes = FileUtilTypes
-          module FileUtilUMASK = FileUtilUMASK
-          module FileUtilWHICH = FileUtilWHICH
-          module FileUtilStr = FileUtilStr
-        '';
+        lib_ml =
+          # Make a top level module exposing all the modules in this package.
+          # The dune config for fileutils has "(wrapped false)" so all the
+          # internal modules are intended to be exposed, and there's no
+          # top-level module built into the upstream package.
+          pkgs.writeText "lib.ml" ''
+            module CommonPath = CommonPath
+            module FilePath = FilePath
+            module FilePath_type = FilePath_type
+            module FileStringExt = FileStringExt
+            module FileUtil = FileUtil
+            module FileUtilCHMOD = FileUtilCHMOD
+            module FileUtilCMP = FileUtilCMP
+            module FileUtilCP = FileUtilCP
+            module FileUtilDU = FileUtilDU
+            module FileUtilFIND = FileUtilFIND
+            module FileUtilLS = FileUtilLS
+            module FileUtilMKDIR = FileUtilMKDIR
+            module FileUtilMV = FileUtilMV
+            module FileUtilMisc = FileUtilMisc
+            module FileUtilMode = FileUtilMode
+            module FileUtilPWD = FileUtilPWD
+            module FileUtilPermission = FileUtilPermission
+            module FileUtilREADLINK = FileUtilREADLINK
+            module FileUtilRM = FileUtilRM
+            module FileUtilSTAT = FileUtilSTAT
+            module FileUtilSize = FileUtilSize
+            module FileUtilTEST = FileUtilTEST
+            module FileUtilTOUCH = FileUtilTOUCH
+            module FileUtilTypes = FileUtilTypes
+            module FileUtilUMASK = FileUtilUMASK
+            module FileUtilWHICH = FileUtilWHICH
+            module FileUtilStr = FileUtilStr
+          '';
       in
       ''
         mkdir src
