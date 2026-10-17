@@ -13,11 +13,9 @@ let
       ...
     }:
     ''
-      # sanity check that the package can be built
-      cp -r ${built} $TMPDIR
-
-      # copy the ported package source to the output
-      cp -r ${source} $out/${name_version}
+      mkdir -p $out/${name_version}
+      cp -r ${source} $out/${name_version}/source
+      cp -r ${built} $out/${name_version}/built
     ''
   ) ports;
 in

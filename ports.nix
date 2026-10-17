@@ -16,7 +16,6 @@ rec {
       tag = "0.9.0";
       hash = "sha256-WRhWNWQ4iTUVpJlp7isJs3+0n/D0gYXTxRcCTJZ1o8U=";
     };
-    deps = [ ];
     prepare = ''
       cp -r $src/src src
     '';
@@ -29,7 +28,6 @@ rec {
       tag = "3.20.2";
       hash = "sha256-JL2RG3JK8SE8AgOm6HEVFVGs9rR0Au4c6LpzziWIkvw=";
     };
-    deps = [ ];
     prepare = ''
       mkdir src
       cp $src/otherlibs/ordering/ordering.ml src/lib.ml
@@ -44,7 +42,6 @@ rec {
       tag = "2.0.0";
       hash = "sha256-Wnv78en87nuAVkgZqZbdoJOiu6Pwi03K+jgMsDI0zb0=";
     };
-    deps = [ ];
     prepare = ''
       mkdir src
       cp $src/src/pp.ml src/lib.ml
@@ -68,5 +65,55 @@ rec {
       cp $src/otherlibs/dyn/dyn.ml src/lib.ml
       cp $src/otherlibs/dyn/dyn.mli src/lib.mli
     '';
+  };
+  fileutils_0_6_6 = pkg {
+    name = "fileutils";
+    version = "0.6.6";
+    src = pkgs.fetchgit {
+      url = "https://github.com/gildor478/ocaml-fileutils";
+      tag = "v0.6.6";
+      hash = "sha256-zZO7aBP7IlyEOOnlDCfv4DfOwUuNQD2C3yQ4Yz0qpos=";
+    };
+    builtins_ = [
+      "str"
+      "unix"
+    ];
+    prepare =
+      let
+        lib_ml = pkgs.writeText "lib.ml" ''
+          module CommonPath = CommonPath
+          module FilePath = FilePath
+          module FilePath_type = FilePath_type
+          module FileStringExt = FileStringExt
+          module FileUtil = FileUtil
+          module FileUtilCHMOD = FileUtilCHMOD
+          module FileUtilCMP = FileUtilCMP
+          module FileUtilCP = FileUtilCP
+          module FileUtilDU = FileUtilDU
+          module FileUtilFIND = FileUtilFIND
+          module FileUtilLS = FileUtilLS
+          module FileUtilMKDIR = FileUtilMKDIR
+          module FileUtilMV = FileUtilMV
+          module FileUtilMisc = FileUtilMisc
+          module FileUtilMode = FileUtilMode
+          module FileUtilPWD = FileUtilPWD
+          module FileUtilPermission = FileUtilPermission
+          module FileUtilREADLINK = FileUtilREADLINK
+          module FileUtilRM = FileUtilRM
+          module FileUtilSTAT = FileUtilSTAT
+          module FileUtilSize = FileUtilSize
+          module FileUtilTEST = FileUtilTEST
+          module FileUtilTOUCH = FileUtilTOUCH
+          module FileUtilTypes = FileUtilTypes
+          module FileUtilUMASK = FileUtilUMASK
+          module FileUtilWHICH = FileUtilWHICH
+          module FileUtilStr = FileUtilStr
+        '';
+      in
+      ''
+        mkdir src
+        cp $src/src/lib/fileutils/{,str/}*.ml{,i} src
+        cp ${lib_ml} src/lib.ml
+      '';
   };
 }

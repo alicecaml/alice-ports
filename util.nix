@@ -9,7 +9,8 @@
       version,
       src,
       prepare,
-      deps,
+      deps ? [ ],
+      builtins_ ? [ ],
     }:
     let
       depLines = builtins.map (
@@ -21,6 +22,8 @@
         "    ${name} path=\"${built}\""
       ) deps;
       depString = pkgs.lib.strings.join "\n" depLines;
+      builtinsLines = builtins.map (name: "    ${name}") builtins_;
+      builtinsString = pkgs.lib.strings.join "\n" builtinsLines;
     in
     rec {
       inherit name version;
@@ -35,6 +38,9 @@
           version "${version}"
           dependencies {
         ${depString}
+          }
+          builtins {
+        ${builtinsString}
           }
         }
       '';
@@ -66,7 +72,7 @@
           alice
         ];
         buildPhase = ''
-          alice build --built-artifacts-from-deps
+          alice build --built-artifacts-from-deps 2>&1 | tee log.txt
         '';
         installPhase = ''
           mkdir -p $out
