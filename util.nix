@@ -53,14 +53,16 @@
       source = pkgs.stdenv.mkDerivation {
         inherit src;
         name = nameVersion;
-        dontUnpack = true;
+        sourceRoot = ".";
         buildPhase = ''
+          mkdir -p $TMPDIR/prepare/src
+          cd $TMPDIR/prepare
           ${prepare}
           cp ${manifest} Alice.kdl
         '';
         installPhase = ''
           mkdir -p $out
-          cp -r Alice.kdl src $out
+          cp -r $TMPDIR/prepare/* $out
         '';
       };
 
@@ -93,4 +95,16 @@
         in
         capitalizeFirst name;
     };
+
+  # Make a top level module exposing all the modules in this package.
+  # When the dune config for a project has "(wrapped false)" all the
+  # internal modules are intended to be exposed. This function is intended to
+  # help in these cases by turning a list of module names into a top level
+  # module.
+  mkTopLevelModuleSource =
+    modules:
+    let
+      text = pkgs.lib.strings.join "\n" (builtins.map (module: "module ${module} = ${module}") modules);
+    in
+    pkgs.writeText "lib.ml" text;
 }

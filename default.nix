@@ -32,7 +32,6 @@ let
         '';
       in
       ''
-        mkdir src
         cp ${main_ml} src/main.ml
       '';
     built_artifacts_from_deps = false;
