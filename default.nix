@@ -4,7 +4,7 @@
 }:
 let
   # name-version of packages to exclude (e.g. xdg-3.20.2)
-  skip = [ "xdg-3.20.2" ];
+  skip = [ ];
 
   util = import ./util.nix { inherit alice pkgs; };
   portsSet = import ./ports.nix { inherit alice pkgs; };

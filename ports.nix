@@ -44,6 +44,7 @@ rec {
       mkdir src
       cp $src/otherlibs/xdg/xdg.ml src/lib.ml
       cp $src/otherlibs/xdg/xdg.mli src/lib.mli
+      cp $src/otherlibs/xdg/xdg_stubs.c src/
     '';
   };
   re_1_14_0 = pkg {
