@@ -155,4 +155,30 @@ rec {
         cp ${lib_ml} src/lib.ml
       '';
   };
+  sexplib0_0_17_0 = pkg {
+    name = "sexplib0";
+    version = "0.17.0";
+    src = pkgs.fetchgit {
+      url = "https://github.com/janestreet/sexplib0";
+      tag = "v0.17.0";
+      hash = "sha256-Q53wEhRet/Ou9Kr0TZNTyXT5ASQpsVLPz5n/I+Fhy+g=";
+    };
+    prepare = ''
+      cp $src/src/*.ml{,i} src
+      mv src/{sexplib0,lib}.ml
+    '';
+  };
+  csexp_1_5_2 = pkg {
+    name = "csexp";
+    version = "1.5.2";
+    src = pkgs.fetchgit {
+      url = "https://github.com/ocaml-dune/csexp";
+      tag = "1.5.2";
+      hash = "sha256-pJWk3H73cQZMYhEH7ak9P10oT0LsxLruZoMw3rmWalw=";
+    };
+    prepare = ''
+      cp $src/src/csexp.ml src/lib.ml
+      cp $src/src/csexp.mli src/lib.mli
+    '';
+  };
 }
