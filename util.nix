@@ -28,7 +28,7 @@
     in
     rec {
       inherit name version;
-      name_version = "${name}-${version}";
+      nameVersion = "${name}-${version}";
 
       # KDL manifest file for the package. Dependencies are currently specified
       # by absolute path though this will need to change in order to publish
@@ -52,7 +52,7 @@
       # create an Alice-compatible "src" directory.
       source = pkgs.stdenv.mkDerivation {
         inherit src;
-        name = name_version;
+        name = nameVersion;
         dontUnpack = true;
         buildPhase = ''
           ${prepare}
@@ -67,7 +67,7 @@
       # A derivation that builds the package along with its dependencies as a
       # sanity check.
       built = pkgs.stdenv.mkDerivation {
-        name = "${name_version}-built";
+        name = "${nameVersion}-built";
         src = source;
         buildInputs = [
           alice
@@ -85,5 +85,12 @@
           cp -r * $out
         '';
       };
+
+      topLevelModuleName =
+        let
+          capitalizeFirst =
+            s: pkgs.lib.toUpper (builtins.substring 0 1 s) + builtins.substring 1 (builtins.stringLength s) s;
+        in
+        capitalizeFirst name;
     };
 }
