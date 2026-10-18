@@ -9,6 +9,7 @@
       version,
       src,
       prepare,
+      built_artifacts_from_deps ? true,
       deps ? [ ],
       builtins_ ? [ ],
     }:
@@ -71,9 +72,14 @@
         buildInputs = [
           alice
         ];
-        buildPhase = ''
-          alice build --built-artifacts-from-deps 2>&1 | tee log.txt
-        '';
+        buildPhase =
+          let
+            built_artifacts_from_deps_arg =
+              if built_artifacts_from_deps then "--built-artifacts-from-deps" else "";
+          in
+          ''
+            alice build ${built_artifacts_from_deps_arg} 2>&1 | tee log.txt
+          '';
         installPhase = ''
           mkdir -p $out
           cp -r * $out
