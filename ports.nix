@@ -6,6 +6,12 @@
 let
   util = import ./util.nix { inherit alice pkgs; };
   pkg = util.mkAlicePkg;
+  dune_3_20_0_git = pkgs.fetchgit {
+    url = "https://github.com/ocaml/dune";
+    tag = "3.20.2";
+    hash = "sha256-JL2RG3JK8SE8AgOm6HEVFVGs9rR0Au4c6LpzziWIkvw=";
+  };
+
 in
 rec {
   climate_0_9_0 = pkg {
@@ -23,15 +29,35 @@ rec {
   ordering_3_20_2 = pkg {
     name = "ordering";
     version = "3.20.2";
-    src = pkgs.fetchgit {
-      url = "https://github.com/ocaml/dune";
-      tag = "3.20.2";
-      hash = "sha256-JL2RG3JK8SE8AgOm6HEVFVGs9rR0Au4c6LpzziWIkvw=";
-    };
+    src = dune_3_20_0_git;
     prepare = ''
       mkdir src
       cp $src/otherlibs/ordering/ordering.ml src/lib.ml
       cp $src/otherlibs/ordering/ordering.mli src/lib.mli
+    '';
+  };
+  xdg_3_20_2 = pkg {
+    name = "xdg";
+    version = "3.20.2";
+    src = dune_3_20_0_git;
+    prepare = ''
+      mkdir src
+      cp $src/otherlibs/xdg/xdg.ml src/lib.ml
+      cp $src/otherlibs/xdg/xdg.mli src/lib.mli
+    '';
+  };
+  re_1_14_0 = pkg {
+    name = "re";
+    version = "1.14.0";
+    src = pkgs.fetchgit {
+      url = "https://github.com/ocaml/ocaml-re";
+      tag = "1.14.0";
+      hash = "sha256-E9iNRecytQ5fLSQxYbbKMfcjs+GSl/YO19MqLiePfog=";
+    };
+    prepare = ''
+      mkdir src
+      cp $src/lib/*.ml{,i} src
+      mv src/{re,lib}.ml
     '';
   };
   pp_2_0_0 = pkg {
