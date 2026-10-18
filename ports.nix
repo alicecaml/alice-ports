@@ -6,11 +6,13 @@
 let
   util = import ./util.nix { inherit alice pkgs; };
   pkg = util.mkAlicePkg;
-  dune_3_20_0_git = pkgs.fetchgit {
-    url = "https://github.com/ocaml/dune";
-    tag = "3.20.2";
-    hash = "sha256-JL2RG3JK8SE8AgOm6HEVFVGs9rR0Au4c6LpzziWIkvw=";
-  };
+  dune_3_20_0_git =
+    # The dune repo contains several packages.
+    pkgs.fetchgit {
+      url = "https://github.com/ocaml/dune";
+      tag = "3.20.2";
+      hash = "sha256-JL2RG3JK8SE8AgOm6HEVFVGs9rR0Au4c6LpzziWIkvw=";
+    };
 
 in
 rec {
@@ -78,11 +80,7 @@ rec {
   dyn_3_20_2 = pkg {
     name = "dyn";
     version = "3.20.2";
-    src = pkgs.fetchgit {
-      url = "https://github.com/ocaml/dune";
-      tag = "3.20.2";
-      hash = "sha256-JL2RG3JK8SE8AgOm6HEVFVGs9rR0Au4c6LpzziWIkvw=";
-    };
+    src = dune_3_20_0_git;
     deps = [
       ordering_3_20_2
       pp_2_0_0
