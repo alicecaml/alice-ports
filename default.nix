@@ -46,22 +46,29 @@ let
       ...
     }:
     ''
-      mkdir -p $out/ports/${nameVersion}
-      cp -r ${source} $out/ports/${nameVersion}/source
-      cp -r ${built} $out/ports/${nameVersion}/built
+      mkdir -p ports
+      cp -r ${source} ports/${nameVersion}
+      cp -r ${built} debug/built-ports/${nameVersion}
     ''
-  ) (ports ++ [ packageDependingOnAllPorts ]);
+  ) ports;
 in
 pkgs.stdenv.mkDerivation {
   name = "alice-ports";
   src = ./.;
-  installPhase =
+  buildPhase =
     let
       installPorts = pkgs.lib.strings.join "\n" installEachPort;
     in
     ''
-      mkdir -p $out
+      mkdir -p debug/built-ports
+
       ${installPorts}
-      mv $out/ports/${packageDependingOnAllPorts.nameVersion} $out/package-depending-on-all-ports
+
+      cp -r ${packageDependingOnAllPorts.built} debug/built-package-depending-on-all-ports
     '';
+  installPhase = ''
+    mkdir -p $out
+    cp -r ports $out/ports
+    cp -r debug $out/debug
+  '';
 }
