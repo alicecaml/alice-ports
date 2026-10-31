@@ -41,11 +41,20 @@ rec {
     name = "xdg";
     version = "3.20.2";
     src = dune_3_20_0_git;
-    prepare = ''
-      cp $src/otherlibs/xdg/xdg.ml src/lib.ml
-      cp $src/otherlibs/xdg/xdg.mli src/lib.mli
-      cp $src/otherlibs/xdg/xdg_stubs.c src/
-    '';
+    prepare =
+      let
+        config_ml = pkgs.writeText "config.ml" ''
+          let () =
+            if Sys.win32 then print_endline "alice:add_c_linker_args:-lshell32 -lole32 -luuid"
+          ;;
+        '';
+      in
+      ''
+        cp $src/otherlibs/xdg/xdg.ml src/lib.ml
+        cp $src/otherlibs/xdg/xdg.mli src/lib.mli
+        cp $src/otherlibs/xdg/xdg_stubs.c src/
+        cp ${config_ml} config.ml
+      '';
   };
   re_1_14_0 = pkg {
     name = "re";
