@@ -7,4 +7,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
-      - run: nix build
+
+      # Test that a package depending on all packages can be built
+      - run: nix build .#debug.dependOnAll

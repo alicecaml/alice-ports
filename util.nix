@@ -2,7 +2,20 @@
   alice,
   pkgs ? import <nixpkgs> { },
 }:
-{
+rec {
+  mkBlock =
+    # Return a string with a block like the dependencies or builtins block
+    # or the empty string if the list of lines is empty.
+    { name, lines }:
+    if builtins.length lines == 0 then
+      ""
+    else
+      ''
+
+          ${name} {
+        ${pkgs.lib.strings.join "\n" lines}
+          }'';
+
   mkAlicePkg =
     {
       name,
@@ -14,35 +27,33 @@
       builtins_ ? [ ],
     }:
     let
-      depLines = builtins.map (
-        {
-          name,
-          built,
-          ...
-        }:
-        "    ${name} path=\"${built}\""
-      ) deps;
-      depString = pkgs.lib.strings.join "\n" depLines;
-      builtinsLines = builtins.map (name: "    ${name}") builtins_;
-      builtinsString = pkgs.lib.strings.join "\n" builtinsLines;
+      depString = mkBlock {
+        name = "dependencies";
+        lines = builtins.map (
+          {
+            name,
+            nameVersion,
+            ...
+          }:
+          # Use a relative path as the location of the dependency.
+          "    ${name} path=\"../${nameVersion}\""
+        ) deps;
+      };
+      builtinsString = mkBlock {
+        name = "builtins";
+        lines = builtins.map (name: "    ${name}") builtins_;
+      };
     in
     rec {
       inherit name version;
       nameVersion = "${name}-${version}";
 
       # KDL manifest file for the package. Dependencies are currently specified
-      # by absolute path though this will need to change in order to publish
-      # these packages.
+      # by relative path as if each package directory were neighbours.
       manifest = pkgs.writeText "${name}-${version}-Alice.kdl" ''
         package {
           name ${name}
-          version "${version}"
-          dependencies {
-        ${depString}
-          }
-          builtins {
-        ${builtinsString}
-          }
+          version "${version}"${depString}${builtinsString}
         }
       '';
 
@@ -63,28 +74,6 @@
         installPhase = ''
           mkdir -p $out
           cp -r $TMPDIR/prepare/* $out
-        '';
-      };
-
-      # A derivation that builds the package along with its dependencies as a
-      # sanity check.
-      built = pkgs.stdenv.mkDerivation {
-        name = "${nameVersion}-built";
-        src = source;
-        buildInputs = [
-          alice
-        ];
-        buildPhase =
-          let
-            built_artifacts_from_deps_arg =
-              if built_artifacts_from_deps then "--built-artifacts-from-deps" else "";
-          in
-          ''
-            alice build ${built_artifacts_from_deps_arg} 2>&1 | tee log.txt
-          '';
-        installPhase = ''
-          mkdir -p $out
-          cp -r * $out
         '';
       };
 

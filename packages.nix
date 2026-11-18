@@ -13,9 +13,9 @@ let
       tag = "3.20.2";
       hash = "sha256-JL2RG3JK8SE8AgOm6HEVFVGs9rR0Au4c6LpzziWIkvw=";
     };
-
 in
 rec {
+
   climate_0_9_0 = pkg {
     name = "climate";
     version = "0.9.0";
@@ -28,6 +28,7 @@ rec {
       cp -r $src/src/* src
     '';
   };
+
   ordering_3_20_2 = pkg {
     name = "ordering";
     version = "3.20.2";
@@ -37,6 +38,7 @@ rec {
       cp $src/otherlibs/ordering/ordering.mli src/lib.mli
     '';
   };
+
   xdg_3_20_2 = pkg {
     name = "xdg";
     version = "3.20.2";
@@ -56,6 +58,7 @@ rec {
         cp ${config_ml} config.ml
       '';
   };
+
   re_1_14_0 = pkg {
     name = "re";
     version = "1.14.0";
@@ -69,6 +72,7 @@ rec {
       mv src/{re,lib}.ml
     '';
   };
+
   pp_2_0_0 = pkg {
     name = "pp";
     version = "2.0.0";
@@ -82,6 +86,7 @@ rec {
       cp $src/src/pp.mli src/lib.mli
     '';
   };
+
   dyn_3_20_2 = pkg {
     name = "dyn";
     version = "3.20.2";
@@ -95,6 +100,7 @@ rec {
       cp $src/otherlibs/dyn/dyn.mli src/lib.mli
     '';
   };
+
   fileutils_0_6_6 = pkg {
     name = "fileutils";
     version = "0.6.6";
@@ -144,6 +150,7 @@ rec {
         cp ${lib_ml} src/lib.ml
       '';
   };
+
   sha_1_15_4 = pkg {
     name = "sha";
     version = "1.15.4";
@@ -164,6 +171,7 @@ rec {
         cp ${lib_ml} src/lib.ml
       '';
   };
+
   sexplib0_0_17_0 = pkg {
     name = "sexplib0";
     version = "0.17.0";
@@ -177,6 +185,7 @@ rec {
       mv src/{sexplib0,lib}.ml
     '';
   };
+
   csexp_1_5_2 = pkg {
     name = "csexp";
     version = "1.5.2";

@@ -23,20 +23,32 @@
         f:
         nixpkgs.lib.genAttrs systems (
           system:
-          f {
-            pkg = import ./default.nix {
+          f (
+            import ./default.nix {
               alice = alice.packages.${system}.default;
               pkgs = import nixpkgs { inherit system; };
-            };
-          }
+            }
+          )
         );
 
     in
     {
       packages = forAllSystems (
-        { pkg, ... }:
         {
-          default = pkg;
+          packages,
+          repo,
+          debug,
+          repo_zip,
+          ...
+        }:
+        {
+          inherit
+            packages
+            repo
+            repo_zip
+            debug
+            ;
+          default = repo_zip;
         }
       );
     };

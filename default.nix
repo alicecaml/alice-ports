@@ -1,74 +1,111 @@
 {
   alice,
   pkgs ? import <nixpkgs> { },
+  package ? null,
 }:
 let
-  # name-version of packages to exclude (e.g. xdg-3.20.2)
-  skip = [ ];
 
   util = import ./util.nix { inherit alice pkgs; };
-  portsSet = import ./ports.nix { inherit alice pkgs; };
-  ports = builtins.filter ({ nameVersion, ... }: !(builtins.elem nameVersion skip)) (
-    builtins.attrValues (portsSet)
-  );
+  packages = import ./packages.nix { inherit alice pkgs; };
 
-  # A package which depends on all other packages. Build-system or packaging
-  # bugs sometimes only manifest when linking executables that depend on
-  # libraries that were incorrectly built.
-  packageDependingOnAllPorts = util.mkAlicePkg {
-    name = "depend_on_all_ports";
-    version = "0.1.0";
-    src = pkgs.runCommand "empty" { } "mkdir -p  $out";
-    deps = ports;
-    prepare =
-      let
-        module_alias_src = pkgs.lib.strings.join "\n" (
-          builtins.map (
-            { topLevelModuleName, ... }: "module ${topLevelModuleName} = ${topLevelModuleName}"
-          ) ports
-        );
-        main_ml = pkgs.writeText "main.ml" ''
-          ${module_alias_src}
-        '';
-      in
-      ''
-        cp ${main_ml} src/main.ml
-      '';
-    built_artifacts_from_deps = false;
+  repo =
+    # A repo with a directory for each package.
+    pkgs.stdenv.mkDerivation {
+      name = "alice-ports";
+      dontUnpack = true;
+      installPhase = pkgs.lib.strings.join "\n" (
+        [ "mkdir $out" ]
+        ++ builtins.map ({ nameVersion, source, ... }: ''
+          cp -r ${source} $out/${nameVersion}
+        '') (builtins.attrValues packages)
+      );
+    };
+
+  repo_zip = pkgs.stdenv.mkDerivation {
+    name = "repo.zip";
+    buildInputs = with pkgs; [ zip ];
+    dontUnpack = true;
+    installPhase = ''
+      mkdir $out
+      cp -r ${repo} alice-ports
+
+      # This will allow users to run `alice build` inside one of the ports to build it.
+      chmod -R u+w alice-ports
+
+      zip -r $out/alice-ports.zip alice-ports
+    '';
   };
 
-  # Commands to copy each package port into a single directory.
-  installEachPort = builtins.map (
-    {
-      nameVersion,
-      source,
-      built,
-      ...
-    }:
-    ''
-      mkdir -p ports
-      cp -r ${source} ports/${nameVersion}
-      cp -r ${built} debug/built-ports/${nameVersion}
-    ''
-  ) ports;
+  mkTestPackage =
+    # Make a derivation that crafts a package depending on a list of packages
+    # and then builds it.
+    { name, deps }:
+    pkgs.stdenv.mkDerivation {
+      inherit name;
+      buildInputs = [ alice ];
+      dontUnpack = true;
+      installPhase =
+        let
+          module_alias_src = pkgs.lib.strings.join "\n" (
+            builtins.map ({ topLevelModuleName, ... }: "module ${topLevelModuleName} = ${topLevelModuleName}") (
+              deps
+            )
+          );
+          main_ml = pkgs.writeText "main.ml" ''
+            ${module_alias_src}
+          '';
+          alice_kdl =
+            let
+              dependencies = util.mkBlock {
+                name = "dependencies";
+                lines = builtins.map (
+                  {
+                    name,
+                    nameVersion,
+                    ...
+                  }:
+                  "    ${name} path=\"${repo}/${nameVersion}\""
+                ) deps;
+              };
+            in
+            pkgs.writeText "Alice.kdl" ''
+              package {
+                name ${name}
+                version "0.1.0"${dependencies}
+              }
+            '';
+        in
+        ''
+          mkdir -p $out/src
+          cp ${main_ml} $out/src/main.ml
+          cp ${alice_kdl} $out/Alice.kdl
+          cd $out
+          alice build 2>&1 | tee log.txt
+        '';
+    };
+
 in
-pkgs.stdenv.mkDerivation {
-  name = "alice-ports";
-  src = ./.;
-  buildPhase =
-    let
-      installPorts = pkgs.lib.strings.join "\n" installEachPort;
-    in
-    ''
-      mkdir -p debug/built-ports
+{
+  inherit repo repo_zip;
 
-      ${installPorts}
+  debug = {
+    dependOn = builtins.mapAttrs (
+      _:
+      (
+        package:
+        mkTestPackage {
+          name = "depend_on_${package.name}";
+          deps = [ package ];
+        }
+      )
+    ) packages;
 
-      cp -r ${packageDependingOnAllPorts.built} debug/built-package-depending-on-all-ports
-    '';
-  installPhase = ''
-    mkdir -p $out
-    cp -r ports $out/ports
-    cp -r debug $out/debug
-  '';
+    dependOnAll = mkTestPackage {
+      name = "depend_on_all";
+      deps = builtins.attrValues packages;
+    };
+  };
+
+  # A derivation for the source of each package so a single package can be examined.
+  packages = builtins.mapAttrs (_: ({ source, ... }: source)) packages;
 }

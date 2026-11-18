@@ -6,9 +6,15 @@ Nix derivations for porting OCaml projects to build with [Alice](https://aliceca
 
 ## Usage
 
-Assemble and build the ports with [Nix Flakes](https://nixos.wiki/wiki/flakes) by running:
+By default this flake creates a zip archive containing all the ports:
 ```
 $ nix build
+$ ls result
+alice-ports.zip
 ```
 
-The port for each package can be accessed via the `result` symlink.
+Other outputs:
+- `.#repo` creates a directory containing each package source directory
+- `.#packages.<package>` (e.g. `.#packages.climate_0_9_0`) creates the package's source directory
+- `.#debug.dependOn.<package>` creates a package depending on the given package and builds it
+- `.#debug.dependOnAll` creates a pcakage depending on all packages and builds it
